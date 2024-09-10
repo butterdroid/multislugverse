@@ -1,3 +1,4 @@
+from PIL.ImageFile import ImageFile
 from generativepy.drawing import make_image, setup
 from generativepy.geometry import Polygon
 from generativepy.color import Color
@@ -61,14 +62,12 @@ def draw(ctx, pixel_width, pixel_height, frame_no, frame_count):
                 if vertice2 > maxsize[1]:
                     maxsize[1] = vertice2+10
 
-                print( maxsize)
-
             Polygon(ctx).of_points(polygon).stroke(
                 Color(random_color_gen.pop() / 255, random_color_gen.pop() / 255, random_color_gen.pop() / 255), line_width=4)
 
 
-image_file = make_image("voronoi-lines.png", draw, SIZE * 2, SIZE * 2)
+make_image("voronoi-lines.png", draw, SIZE * 2, SIZE * 2)
 
-image = Image.open("voronoi-lines.png").crop((0,0,maxsize[0],maxsize[1]))
+image: ImageFile = Image.open("voronoi-lines.png").crop((0,0,maxsize[0],maxsize[1]))
 # noinspection SpellCheckingInspection
 image.save("multislugverse.jpg")
