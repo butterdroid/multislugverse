@@ -1,73 +1,33 @@
-from PIL.ImageFile import ImageFile
-from generativepy.drawing import make_image, setup
-from generativepy.geometry import Polygon
-from generativepy.color import Color
-from scipy.spatial import Voronoi
-import random
-from PIL import Image
+from gettext import textdomain
+
+import generate_verse
+import kivy
+kivy.require('2.3.0')
+
+from kivy.app import App
+from kivy.uix.label import Label
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
+
+class CreateScreen(GridLayout):
+
+    def __init__(self, **kwargs):
+        super(CreateScreen, self).__init__(**kwargs)
+        self.cols = 2
+        self.add_widget(Label(text='Colour:'))
+        self.colour = TextInput(multiline=False)
+        self.add_widget(self.colour)
+        self.add_widget(Label(text='Size:'))
+        self.canvas_size = TextInput(multiline=False)
+        self.add_widget(self.canvas_size)
 
 
-def random_color_generator():
-    r = random.randint(0, 255)
-    g = random.randint(0, 255)
-    b = random.randint(0, 255)
-    return [r, g, b]
 
 
-random_color = random_color_generator()
-
-SIZE = 500
-POINTS = 20
-
-maxsize = [0,0]
-
-# Create a list of random points
-random.seed()
-points = [[random.randrange(SIZE), random.randrange(SIZE)]
-          for i in range(POINTS)]
+class MultiSlug(App):
+    def build(self):
+        return CreateScreen()
 
 
-def draw(ctx, pixel_width, pixel_height, frame_no, frame_count):
-    setup(ctx, pixel_width, pixel_height, background=Color(1))
-    voronoi = Voronoi(points)
-
-    voronoi_vertices = voronoi.vertices
-
-    for region in voronoi.regions:
-        if -1 not in region:
-            random_color_gen = random_color_generator()
-
-
-            polygon = []
-
-            for p in region:
-
-                vertice1 = voronoi_vertices[p][0]
-                vertice2 = voronoi_vertices[p][1]
-
-                if vertice1 > SIZE*2:
-                    vertice1 = SIZE-1
-                if vertice1 < 0:
-                    vertice1 = 10
-                if vertice2 > SIZE*2:
-                    vertice2 = SIZE-1
-                if vertice2 < 0:
-                    vertice2 = 10
-
-                polygon.append((vertice1,vertice2))
-
-                # Determine if new max size
-                if vertice1 > maxsize[0]:
-                    maxsize[0] = vertice1+10
-                if vertice2 > maxsize[1]:
-                    maxsize[1] = vertice2+10
-
-            Polygon(ctx).of_points(polygon).stroke(
-                Color(random_color_gen.pop() / 255, random_color_gen.pop() / 255, random_color_gen.pop() / 255), line_width=4)
-
-
-make_image("voronoi-lines.png", draw, SIZE * 2, SIZE * 2)
-
-image: ImageFile = Image.open("voronoi-lines.png").crop((0,0,maxsize[0],maxsize[1]))
-# noinspection SpellCheckingInspection
-image.save("multislugverse.jpg")
+if __name__ == '__main__':
+    MultiSlug().run()
