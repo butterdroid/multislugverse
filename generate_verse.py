@@ -17,14 +17,19 @@ def random_color_generator():
 SIZE = 500
 POINTS = 20
 
-maxsize = [0,0]
+maxsize = [0, 0]
 
 colour = False
 random_color_gen = random_color_generator()
+
+
 # Create a list of random points
-random.seed()
-points = [[random.randrange(SIZE), random.randrange(SIZE)]
-          for i in range(POINTS)]
+
+def random_points():
+    random.seed()
+    global points
+    points = [[random.randrange(SIZE), random.randrange(SIZE)]
+              for i in range(POINTS)]
 
 
 def draw(ctx, pixel_width, pixel_height, frame_no, frame_count):
@@ -40,7 +45,7 @@ def draw(ctx, pixel_width, pixel_height, frame_no, frame_count):
             if colour:
                 random_color_gen = random_color_generator()
             else:
-                random_color_gen = [0,0,0]
+                random_color_gen = [0, 0, 0]
 
             polygon = []
 
@@ -49,31 +54,33 @@ def draw(ctx, pixel_width, pixel_height, frame_no, frame_count):
                 vertice1 = voronoi_vertices[p][0]
                 vertice2 = voronoi_vertices[p][1]
 
-                if vertice1 > SIZE*2:
-                    vertice1 = SIZE-1
+                if vertice1 > SIZE * 2:
+                    vertice1 = SIZE - 1
                 if vertice1 < 0:
                     vertice1 = 10
-                if vertice2 > SIZE*2:
-                    vertice2 = SIZE-1
+                if vertice2 > SIZE * 2:
+                    vertice2 = SIZE - 1
                 if vertice2 < 0:
                     vertice2 = 10
 
-                polygon.append((vertice1,vertice2))
+                polygon.append((vertice1, vertice2))
 
                 # Determine if new max size
                 if vertice1 > maxsize[0]:
-                    maxsize[0] = vertice1+10
+                    maxsize[0] = vertice1 + 10
                 if vertice2 > maxsize[1]:
-                    maxsize[1] = vertice2+10
+                    maxsize[1] = vertice2 + 10
 
             Polygon(ctx).of_points(polygon).stroke(
-                Color(random_color_gen.pop() / 255, random_color_gen.pop() / 255, random_color_gen.pop() / 255), line_width=4)
+                Color(random_color_gen.pop() / 255, random_color_gen.pop() / 255, random_color_gen.pop() / 255),
+                line_width=4)
 
 
 def generate_main(colour_input=False, size=500):
     global colour, SIZE
     colour = colour_input
-    SIZE =  size
+    SIZE = size
+    random_points()
 
     make_image("voronoi-lines.png", draw, SIZE * 2, SIZE * 2)
     image: ImageFile = Image.open("voronoi-lines.png").crop((0, 0, maxsize[0], maxsize[1]))
